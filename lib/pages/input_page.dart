@@ -1,9 +1,8 @@
-import 'dart:async';
 import 'dart:math';
-import 'package:flutter_tts/flutter_tts.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:audio_service/audio_service.dart';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_multiplication_trainer_app/backgrounds/audio_background.dart';
 
 import 'package:flutter_multiplication_trainer_app/helpers/constants.dart';
 import 'package:flutter_multiplication_trainer_app/preferences/shared_preferences.dart';
@@ -103,98 +102,10 @@ class _InputPageState extends State<InputPage> {
     setState(() {
       result = factor1 * factor2;
     });
-    AudioService.start(backgroundTaskEntrypoint: _backgroundTaskEntrypoint);
+    // AudioService.start(backgroundTaskEntrypoint: _backgroundTaskEntrypoint);
+    AudioService.start(backgroundTaskEntrypoint: textToSpeechTaskEntrypoint);
   }
 }
-
-_backgroundTaskEntrypoint() {
-  AudioServiceBackground.run(() => AudioPlayerTask());
-}
-
-class AudioPlayerTask extends BackgroundAudioTask {
-  final _audioPlayer = AudioPlayer();
-  //final _completer = Completer();
-
-  // @override
-  // Future<void> onStart(Map<String, dynamic>? params) async {
-  //   // Connect to the URL
-  //   await _audioPlayer.setUrl(
-  //       "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3");
-  //   //_audioPlayer.setAsset(assetPath)
-  //   // Now we're ready to play
-  //   _audioPlayer.play();
-  // }
-  @override
-  Future<void> onStart(Map<String, dynamic>? params) async {
-    final mediaItem = MediaItem(
-      id: "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3",
-      album: "Foo",
-      title: "Bar",
-    );
-    // Tell the UI and media notification what we're playing.
-    AudioServiceBackground.setMediaItem(mediaItem);
-    // Listen to state changes on the player...
-    _audioPlayer.playerStateStream.listen((playerState) {
-      // ... and forward them to all audio_service clients.
-      AudioServiceBackground.setState(
-        playing: playerState.playing,
-        // Every state from the audio player gets mapped onto an audio_service state.
-        processingState: {
-          // ProcessingState.none: AudioProcessingState.none,
-          ProcessingState.loading: AudioProcessingState.connecting,
-          ProcessingState.buffering: AudioProcessingState.buffering,
-          ProcessingState.ready: AudioProcessingState.ready,
-          ProcessingState.completed: AudioProcessingState.completed,
-        }[playerState.processingState],
-        // Tell clients what buttons/controls should be enabled in the
-        // current state.
-        controls: [
-          playerState.playing ? MediaControl.pause : MediaControl.play,
-          MediaControl.stop,
-        ],
-      );
-    });
-    // Play when ready.
-    _audioPlayer.play();
-    // Start loading something (will play when ready).
-    await _audioPlayer.setUrl(mediaItem.id);
-  }
-
-  @override
-  Future<void> onStop() async {
-    // Stop playing audio
-    await _audioPlayer.stop();
-    // Shut down this background task
-    await super.onStop();
-  }
-}
-
-// class AudioPlayerTask extends BackgroundAudioTask {
-//   final _tts = FlutterTts();
-//   bool _finished = false;
-//   Completer _completer = Completer();
-
-//   @override
-//   Future<void> onStart(Map<String, dynamic>? params) async {
-//     // for (var n = 1; !_finished && n <= 10; n++) {
-//     //   _tts.speak("$n");
-//     //   await Future.delayed(Duration(seconds: 1));
-//     // }
-
-//     _tts.speak("${1245}");
-//     _completer.complete();
-//   }
-
-//   @override
-//   Future<void> onStop() async {
-//     // Stop speaking the numbers
-//     _finished = true;
-//     // Wait for `onStart` to complete
-//     await _completer.future;
-//     // Now we're ready to let the isolate shut down
-//     await super.onStop();
-//   }
-// }
 
 class FactorCard extends StatelessWidget {
   const FactorCard({
