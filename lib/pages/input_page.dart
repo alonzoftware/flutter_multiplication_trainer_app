@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_multiplication_trainer_app/helpers/constants.dart';
+import 'package:flutter_multiplication_trainer_app/preferences/shared_preferences.dart';
 import 'package:flutter_multiplication_trainer_app/widgets/bottom_button.dart';
 import 'package:flutter_multiplication_trainer_app/widgets/reusable_card.dart';
 
@@ -11,14 +12,28 @@ class InputPage extends StatefulWidget {
 }
 
 class _InputPageState extends State<InputPage> {
+  final prefs = sharedPrefsService;
   int factor1 = 0;
   int factor2 = 0;
   int result = 0;
   @override
   Widget build(BuildContext context) {
+    factor1 = prefs.factor1;
+    factor2 = prefs.factor2;
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text('Multiplication Trainer'),
+        actions: [
+          Container(
+            margin: EdgeInsets.only(right: 5),
+            child: IconButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, 'settings');
+                },
+                icon: Icon(Icons.settings)),
+          )
+        ],
       ),
       body: SafeArea(
           child: Column(
@@ -58,8 +73,8 @@ class _InputPageState extends State<InputPage> {
           BottomButton(
               text: 'GENERATE',
               color: Colors.blueAccent,
-              onTap: () => generateFactor),
-          BottomButton(text: 'RESULT', onTap: () => calculate),
+              onTap: generateFactor),
+          BottomButton(text: 'RESULT', onTap: calculate),
         ],
       )),
     );
@@ -67,14 +82,16 @@ class _InputPageState extends State<InputPage> {
 
   void generateFactor() {
     Random rnd;
-    int min = 5;
-    int max = 99;
+    int min = prefs.minLimit;
+    int max = prefs.maxLimit;
     rnd = new Random();
-    setState(() {
-      factor1 = min + rnd.nextInt(max - min);
-      factor2 = min + rnd.nextInt(max - min);
-      result = 0;
-    });
+
+    factor1 = min + rnd.nextInt(max - min);
+    factor2 = min + rnd.nextInt(max - min);
+    prefs.factor1 = factor1;
+    prefs.factor2 = factor2;
+    result = 0;
+    setState(() {});
   }
 
   void calculate() {

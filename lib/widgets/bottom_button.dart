@@ -12,7 +12,8 @@ class BottomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap(),
+      behavior: HitTestBehavior.translucent,
+      onTap: () => onTap(),
       child: Container(
         decoration: BoxDecoration(
           color: color,
