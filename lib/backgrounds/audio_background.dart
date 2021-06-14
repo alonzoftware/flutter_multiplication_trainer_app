@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -100,7 +101,6 @@ void textToSpeechTaskEntrypoint() async {
 /// This task defines logic for speaking a sequence of numbers using
 /// text-to-speech.
 class TextPlayerTask extends BackgroundAudioTask {
-  int number = 3;
   Tts _tts = Tts();
   bool _finished = false;
   Sleeper _sleeper = Sleeper();
@@ -108,6 +108,20 @@ class TextPlayerTask extends BackgroundAudioTask {
   bool _interrupted = false;
 
   bool get _playing => AudioServiceBackground.state.playing;
+
+  @override
+  Future<void> onTaskRemoved() async {
+    if (!AudioServiceBackground.state.playing) {
+      await onStop();
+    }
+    super.onTaskRemoved();
+  }
+
+  @override
+  Future<void> onUpdateQueue(List<MediaItem>? mediaItemList) async {
+    AudioServiceBackground.setQueue(mediaItemList!);
+    print('Queue Modified!!');
+  }
 
   @override
   Future<void> onStart(Map<String, dynamic>? params) async {
@@ -145,12 +159,14 @@ class TextPlayerTask extends BackgroundAudioTask {
 
     // Start playing.
     await _playPause();
-
-    AudioServiceBackground.setMediaItem(mediaItem(number));
+    // final mediaItemPlay = mediaItem(1);
+    final mediaItemPlay = MediaItem.fromJson(params!['mediaItem']);
+    AudioServiceBackground.setMediaItem(mediaItemPlay!);
     AudioServiceBackground.androidForceEnableMediaButtons();
     try {
-      await _tts.speak('$number');
-      print('Index: $number');
+      await _tts.speak(mediaItemPlay.artist.toString());
+      //await _tts.speak('1245');
+      //print('Index: ${AudioService.queue![0].id}');
       await _sleeper.sleep(Duration(milliseconds: 300));
     } catch (e) {
       // Speech was interrupted
@@ -164,6 +180,7 @@ class TextPlayerTask extends BackgroundAudioTask {
         // unpaused
       }
     }
+
     // for (var i = 1; i <= 10 && !_finished;) {
     //   AudioServiceBackground.setMediaItem(mediaItem(i));
     //   AudioServiceBackground.androidForceEnableMediaButtons();
@@ -247,6 +264,9 @@ class TextPlayerTask extends BackgroundAudioTask {
       }
     }
   }
+
+  // Load and broadcast the queue
+
 }
 
 class Sleeper {
@@ -298,6 +318,8 @@ class Tts {
     _playing = true;
     if (!_interruptRequested) {
       _speechCompleter = Completer();
+      // await _flutterTts.setLanguage('en-US');
+      await _flutterTts.setLanguage('es-ES');
       await _flutterTts.speak(text);
       await _speechCompleter!.future;
       _speechCompleter = null;

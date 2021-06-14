@@ -19,6 +19,13 @@ class _InputPageState extends State<InputPage> {
   int factor1 = 0;
   int factor2 = 0;
   int result = 0;
+
+  // @override
+  // void initState() {
+  //   AudioService.start(backgroundTaskEntrypoint: textToSpeechTaskEntrypoint);
+  //   super.initState();
+  // }
+
   @override
   Widget build(BuildContext context) {
     factor1 = prefs.factor1;
@@ -83,7 +90,7 @@ class _InputPageState extends State<InputPage> {
     );
   }
 
-  void generateFactor() {
+  void generateFactor() async {
     Random rnd;
     int min = prefs.minLimit;
     int max = prefs.maxLimit;
@@ -96,14 +103,29 @@ class _InputPageState extends State<InputPage> {
     result = 0;
     setState(() {});
     AudioService.stop();
+    // await AudioService.connect();
+    // await AudioService.updateQueue(queue);
   }
 
-  void calculate() {
+  List<MediaItem> queue = [
+    MediaItem(
+        id: '1', album: 'Numbers', title: 'Number 1', artist: 'Sample Artist 1')
+  ];
+  void calculate() async {
     setState(() {
       result = factor1 * factor2;
+      prefs.result = result;
     });
     // AudioService.start(backgroundTaskEntrypoint: _backgroundTaskEntrypoint);
-    AudioService.start(backgroundTaskEntrypoint: textToSpeechTaskEntrypoint);
+
+//AudioService.addQueueItem(myMediaItem);
+    final mediaItem = MediaItem(
+        id: '1', album: 'Numbers', title: 'Number 1', artist: '$result');
+    await AudioService.connect();
+    await AudioService.start(
+        backgroundTaskEntrypoint: textToSpeechTaskEntrypoint,
+        androidEnableQueue: true,
+        params: {'mediaItem': mediaItem.toJson()});
   }
 }
 
