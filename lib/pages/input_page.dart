@@ -20,11 +20,17 @@ class _InputPageState extends State<InputPage> {
   int factor2 = 0;
   int result = 0;
 
-  // @override
-  // void initState() {
-  //   AudioService.start(backgroundTaskEntrypoint: textToSpeechTaskEntrypoint);
-  //   super.initState();
-  // }
+  @override
+  void initState() {
+    AudioService.playbackStateStream.listen((PlaybackState state) {
+      if (state.playing) {
+        print('Playing!!');
+      } else {
+        print('Stopped!!');
+      }
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

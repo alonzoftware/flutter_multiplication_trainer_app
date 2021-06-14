@@ -106,6 +106,9 @@ class TextPlayerTask extends BackgroundAudioTask {
   Sleeper _sleeper = Sleeper();
   Completer _completer = Completer();
   bool _interrupted = false;
+  String lectureTest = ''' 
+  It’s hard for parents to decide where their newborn will sleep. The American Academy of Pediatrics (AAP) suggests that parents sleep in the same room as their babies for a year. Doctor Ian Paul did an independent study on this topic. Paul found that infants sleep more when they sleep in their own room before they’re four months old. Also, babies feel more anxious about sleeping if they are moved to their own room later. The AAP emphasizes the risk of sudden infant death syndrome (SIDS).It is the highest in infants under six months old. However, Paul’s report states studies done on SIDS show there’s no difference between room sharing and independent sleeping after the baby is four months old. At the age of nine months, the baby will sleep about one hour and forty minutes longer. He believes the AAP went too far with their sleeping arrangement recommendation. Parents should think about the consequences of getting less sleep by room sharing with their baby.
+  ''';
 
   bool get _playing => AudioServiceBackground.state.playing;
 
@@ -159,13 +162,13 @@ class TextPlayerTask extends BackgroundAudioTask {
 
     // Start playing.
     await _playPause();
-    // final mediaItemPlay = mediaItem(1);
+    //final mediaItemPlay = mediaItem(1);
     final mediaItemPlay = MediaItem.fromJson(params!['mediaItem']);
-    AudioServiceBackground.setMediaItem(mediaItemPlay!);
+    AudioServiceBackground.setMediaItem(mediaItemPlay);
     AudioServiceBackground.androidForceEnableMediaButtons();
     try {
       await _tts.speak(mediaItemPlay.artist.toString());
-      //await _tts.speak('1245');
+      //await _tts.speak(lectureTest);
       //print('Index: ${AudioService.queue![0].id}');
       await _sleeper.sleep(Duration(milliseconds: 300));
     } catch (e) {
@@ -181,14 +184,18 @@ class TextPlayerTask extends BackgroundAudioTask {
       }
     }
 
-    // for (var i = 1; i <= 10 && !_finished;) {
+    // for (var i = 1; i <= 20 && !_finished;) {
     //   AudioServiceBackground.setMediaItem(mediaItem(i));
     //   AudioServiceBackground.androidForceEnableMediaButtons();
     //   try {
-    //     await _tts.speak('$i');
+    //     if (i == 1 || i == 5 || i == 10 || i == 15 || i == 20) {
+    //       await _tts.speak('$i');
+    //     }
+
     //     print('Index: $i');
     //     i++;
-    //     await _sleeper.sleep(Duration(milliseconds: 300));
+    //     // await _sleeper.sleep(Duration(milliseconds: 300));
+    //     await _sleeper.sleep(Duration(seconds: 1));
     //   } catch (e) {
     //     // Speech was interrupted
     //   }
@@ -263,6 +270,7 @@ class TextPlayerTask extends BackgroundAudioTask {
         _sleeper.interrupt();
       }
     }
+    print('Play Pause !!');
   }
 
   // Load and broadcast the queue
@@ -318,8 +326,10 @@ class Tts {
     _playing = true;
     if (!_interruptRequested) {
       _speechCompleter = Completer();
-      // await _flutterTts.setLanguage('en-US');
+      //await _flutterTts.setLanguage('en-US');
       await _flutterTts.setLanguage('es-ES');
+      //await _flutterTts.setVoice({'name': 'es-es-x-eed-local, locale: es-ES'});
+      //await _flutterTts.setVoice({'name': 'es-US-language'});
       await _flutterTts.speak(text);
       await _speechCompleter!.future;
       _speechCompleter = null;
@@ -329,6 +339,11 @@ class Tts {
       _interruptRequested = false;
       throw TtsInterruptedException();
     }
+
+    // final voices = await _flutterTts.getVoices;
+    // for (var voice in voices) {
+    //   print(voice);
+    // }
   }
 
   Future<void> stop() async {
