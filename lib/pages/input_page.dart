@@ -132,6 +132,8 @@ class _InputPageState extends State<InputPage> {
         backgroundTaskEntrypoint: textToSpeechTaskEntrypoint,
         androidEnableQueue: true,
         params: {'mediaItem': mediaItem.toJson()});
+    await AudioService.stop();
+    await AudioService.disconnect();
   }
 }
 
