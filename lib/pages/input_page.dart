@@ -7,6 +7,7 @@ import 'package:flutter_multiplication_trainer_app/backgrounds/audio_background.
 import 'package:flutter_multiplication_trainer_app/helpers/constants.dart';
 import 'package:flutter_multiplication_trainer_app/preferences/shared_preferences.dart';
 import 'package:flutter_multiplication_trainer_app/widgets/bottom_button.dart';
+import 'package:flutter_multiplication_trainer_app/widgets/bottom_navbar.dart';
 import 'package:flutter_multiplication_trainer_app/widgets/reusable_card.dart';
 
 class InputPage extends StatefulWidget {
@@ -91,6 +92,7 @@ class _InputPageState extends State<InputPage> {
               color: Colors.blueAccent,
               onTap: generateFactor),
           BottomButton(text: 'RESULT', onTap: calculate),
+          BottomNavBar(),
         ],
       )),
     );
