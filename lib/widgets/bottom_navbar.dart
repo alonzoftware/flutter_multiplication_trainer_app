@@ -5,34 +5,38 @@ class BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        IconButton(
-            icon: Icon(
-              Icons.home,
-              size: iconSize,
-            ),
-            onPressed: () {
-              print('Camera Pressed');
-            }),
-        IconButton(
-            icon: Icon(
-              Icons.camera,
-              size: iconSize,
-            ),
-            onPressed: () {
-              print('Camera Pressed');
-            }),
-        IconButton(
-            icon: Icon(
-              Icons.print,
-              size: iconSize,
-            ),
-            onPressed: () {
-              print('Camera Pressed');
-            }),
-      ],
+    return Container(
+      decoration: BoxDecoration(color: Colors.blueGrey[900]),
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          IconButton(
+              icon: Icon(
+                Icons.home,
+                size: iconSize,
+              ),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, 'home');
+              }),
+          IconButton(
+              icon: Icon(
+                Icons.headphones,
+                size: iconSize,
+              ),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, 'audio');
+              }),
+          IconButton(
+              icon: Icon(
+                Icons.settings,
+                size: iconSize,
+              ),
+              onPressed: () {
+                Navigator.pushNamed(context, 'settings');
+              }),
+        ],
+      ),
     );
   }
 }
