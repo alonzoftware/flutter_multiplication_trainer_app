@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -162,52 +163,39 @@ class TextPlayerTask extends BackgroundAudioTask {
     // Start playing.
     await _playPause();
     //final mediaItemPlay = mediaItem(1);
-    final mediaItemPlay = MediaItem.fromJson(params!['mediaItem']);
-    AudioServiceBackground.setMediaItem(mediaItemPlay);
-    AudioServiceBackground.androidForceEnableMediaButtons();
-    try {
-      await _tts.speak(mediaItemPlay.artist.toString());
-      //await _tts.speak(lectureTest);
-      //print('Index: ${AudioService.queue![0].id}');
-      await _sleeper.sleep(Duration(milliseconds: 300));
-    } catch (e) {
-      // Speech was interrupted
-    }
-    // If we were just paused
-    if (!_finished && !_playing) {
+    //final mediaItemPlay = MediaItem.fromJson(params!['mediaItem']);
+    //print(params!['Operations'][0]['factor1']);
+    int factor1, factor2, result;
+    final operations = params!['Operations'];
+    for (var i = 0; i < operations.length && !_finished;) {
+      //print(operations[i]['factor1']);
+      factor1 = operations[i]['factor1'];
+      factor2 = operations[i]['factor2'];
+      result = operations[i]['result'];
+      AudioServiceBackground.setMediaItem(mediaItem(i));
+      AudioServiceBackground.androidForceEnableMediaButtons();
       try {
-        // Wait to be unpaused
-        await _sleeper.sleep();
+        //await _tts.speak('$i');
+        await _tts.speak('$factor1 por $factor2 es igual a $result');
+
+        print('Index: $i');
+        i++;
+        await _sleeper.sleep(Duration(milliseconds: 300));
+        //await _sleeper.sleep(Duration(seconds: 1));
       } catch (e) {
-        // unpaused
+        // Speech was interrupted
+      }
+      // If we were just paused
+      if (!_finished && !_playing) {
+        try {
+          // Wait to be unpaused
+          await _sleeper.sleep();
+        } catch (e) {
+          // unpaused
+        }
       }
     }
 
-    // for (var i = 1; i <= 20 && !_finished;) {
-    //   AudioServiceBackground.setMediaItem(mediaItem(i));
-    //   AudioServiceBackground.androidForceEnableMediaButtons();
-    //   try {
-    //     if (i == 1 || i == 5 || i == 10 || i == 15 || i == 20) {
-    //       await _tts.speak('$i');
-    //     }
-
-    //     print('Index: $i');
-    //     i++;
-    //     // await _sleeper.sleep(Duration(milliseconds: 300));
-    //     await _sleeper.sleep(Duration(seconds: 1));
-    //   } catch (e) {
-    //     // Speech was interrupted
-    //   }
-    //   // If we were just paused
-    //   if (!_finished && !_playing) {
-    //     try {
-    //       // Wait to be unpaused
-    //       await _sleeper.sleep();
-    //     } catch (e) {
-    //       // unpaused
-    //     }
-    //   }
-    // }
     await AudioServiceBackground.setState(
       controls: [],
       processingState: AudioProcessingState.stopped,
@@ -244,15 +232,33 @@ class TextPlayerTask extends BackgroundAudioTask {
       artist: 'Sample Artist');
 
   Future<void> _playPause() async {
+    final session = await AudioSession.instance;
     if (_playing) {
-      _interrupted = false;
-      await AudioServiceBackground.setState(
-        controls: [MediaControl.play, MediaControl.stop],
-        processingState: AudioProcessingState.ready,
-        playing: false,
-      );
-      _sleeper.interrupt();
-      _tts.interrupt();
+      if (Platform.isAndroid) {
+        _interrupted = false;
+        await AudioServiceBackground.setState(
+          controls: [MediaControl.play, MediaControl.stop],
+          processingState: AudioProcessingState.ready,
+          playing: false,
+        );
+        _tts.interrupt();
+        _sleeper.interrupt();
+      } else {
+        print(AudioServiceBackground.state.position);
+        //_interrupted = false;
+        //print(AudioServiceBackground.state.);
+        if (await session.setActive(true)) {
+          _tts.interrupt();
+          _sleeper.interrupt();
+          await _sleeper.sleep(Duration(milliseconds: 350));
+          await AudioServiceBackground.setState(
+            controls: [MediaControl.play, MediaControl.stop],
+            processingState: AudioProcessingState.ready,
+            playing: false,
+          );
+          _tts.interrupt();
+        }
+      }
     } else {
       final session = await AudioSession.instance;
       // flutter_tts doesn't activate the session, so we do it here. This
@@ -269,7 +275,6 @@ class TextPlayerTask extends BackgroundAudioTask {
         _sleeper.interrupt();
       }
     }
-    print('Play Pause !!');
   }
 
   // Load and broadcast the queue

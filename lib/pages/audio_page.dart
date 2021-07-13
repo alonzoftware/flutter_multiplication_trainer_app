@@ -14,7 +14,7 @@ class AudioPage extends StatefulWidget {
 
 class _AudioPageState extends State<AudioPage> {
   final prefs = sharedPrefsService;
-  List<Operation> operations = [];
+  List<Operation> operationsList = [];
   @override
   void initState() {
     Random rnd;
@@ -31,28 +31,56 @@ class _AudioPageState extends State<AudioPage> {
       factor1 = min + rnd.nextInt(max - min);
       factor2 = min + rnd.nextInt(max - min);
       result = factor1 * factor2;
-      print('$i : $factor1 $factor2 $result');
+      //print('$i : $factor1 $factor2 $result');
       Operation opTemp =
           new Operation(factor1: factor1, factor2: factor2, result: result);
-      operations.add(opTemp);
+      operationsList.add(opTemp);
     }
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: Text('Audio Page'),
       ),
-      floatingActionButton: PlayStopButton(operations),
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            Expanded(
-              child: ListOperations(operations),
+            Column(
+              children: [
+                Expanded(
+                  child: ListOperations(operationsList),
+                ),
+                BottomNavBar(),
+              ],
             ),
-            BottomNavBar(),
+            Positioned(
+              child: Column(
+                children: [
+                  PlayStopButton(Operations(operations: operationsList)),
+                  StreamBuilder<bool>(
+                    stream: AudioService.playbackStateStream
+                        .map((state) => state.playing)
+                        .distinct(),
+                    builder: (context, snapshot) {
+                      final playing = snapshot.data ?? false;
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (playing) pauseButton() else playButton(),
+                          stopButton(),
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              ),
+              bottom: 200,
+              right: 50,
+            )
           ],
         ),
       ),
@@ -60,8 +88,26 @@ class _AudioPageState extends State<AudioPage> {
   }
 }
 
+IconButton playButton() => IconButton(
+      icon: Icon(Icons.play_arrow),
+      iconSize: 64.0,
+      onPressed: AudioService.play,
+    );
+
+IconButton pauseButton() => IconButton(
+      icon: Icon(Icons.pause),
+      iconSize: 64.0,
+      onPressed: AudioService.pause,
+    );
+
+IconButton stopButton() => IconButton(
+      icon: Icon(Icons.stop),
+      iconSize: 64.0,
+      onPressed: AudioService.stop,
+    );
+
 class PlayStopButton extends StatelessWidget {
-  final List<Operation> operations;
+  final Operations operations;
   PlayStopButton(this.operations);
 
   @override
@@ -80,11 +126,12 @@ class PlayStopButton extends StatelessWidget {
         onPressed: () async {
           // final mediaItem = MediaItem(
           //     id: '1', album: 'Numbers', title: 'Number 1', artist: '$result');
-          // await AudioService.connect();
-          // await AudioService.start(
-          //     backgroundTaskEntrypoint: textToSpeechTaskEntrypoint,
-          //     androidEnableQueue: true,
-          //     params: {'mediaItems': operations.toJson()});
+
+          await AudioService.connect();
+          await AudioService.start(
+              backgroundTaskEntrypoint: textToSpeechTaskEntrypoint,
+              androidEnableQueue: true,
+              params: operations.toJson());
           // await AudioService.stop();
           // await AudioService.disconnect();
         },
