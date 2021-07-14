@@ -16,6 +16,7 @@ class _AudioPageState extends State<AudioPage> {
   final prefs = sharedPrefsService;
   late Operations operations;
   List<Operation> operationsList = [];
+  List<dynamic> operationsJson = [];
   bool isPlayingForUI = false;
 
   @override
@@ -80,6 +81,7 @@ class _AudioPageState extends State<AudioPage> {
       Operation opTemp =
           new Operation(factor1: factor1, factor2: factor2, result: result);
       operationsList.add(opTemp);
+      operationsJson.add(opTemp.toJson());
     }
     operations = Operations(operations: operationsList);
     super.initState();
@@ -145,12 +147,19 @@ class _AudioPageState extends State<AudioPage> {
         onPressed: (isPlayingForUI)
             ? AudioService.play
             : () async {
+                Map<String, dynamic> params = {
+                  'Operations': operationsJson,
+                  'Repetitions': 2
+                };
+                print(params);
                 isPlayingForUI = true;
                 await AudioService.connect();
                 await AudioService.start(
-                    backgroundTaskEntrypoint: textToSpeechTaskEntrypoint,
-                    androidEnableQueue: true,
-                    params: operations.toJson());
+                  backgroundTaskEntrypoint: textToSpeechTaskEntrypoint,
+                  androidEnableQueue: true,
+                  params: params,
+                  // params: operations.toJson(),
+                );
               },
       );
 

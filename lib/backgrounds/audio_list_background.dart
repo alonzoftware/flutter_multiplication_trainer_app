@@ -167,21 +167,38 @@ class TextPlayerTask extends BackgroundAudioTask {
     //print(params!['Operations'][0]['factor1']);
     int factor1, factor2, result;
     final operations = params!['Operations'];
-    for (var i = 0; i < operations.length && !_finished;) {
-      //print(operations[i]['factor1']);
+    final repetitions = params['Repetitions'];
+    final List<String> playList = [];
+    for (int i = 0; i < operations.length; i++) {
       factor1 = operations[i]['factor1'];
       factor2 = operations[i]['factor2'];
       result = operations[i]['result'];
+      for (int j = 0; j < repetitions; j++) {
+        playList.add('operación $factor1 por $factor2');
+      }
+      playList.add('$factor1 por $factor2 es igual a $result');
+    }
+
+    for (int i = 0; i < playList.length && !_finished;) {
+      //print(operations[i]['factor1']);
+      // factor1 = operations[i]['factor1'];
+      // factor2 = operations[i]['factor2'];
+      // result = operations[i]['result'];
+      // factor1 = operations[i].factor1;
+      // factor2 = operations[i].factor2;
+      // result = operations[i].result;
       AudioServiceBackground.setMediaItem(mediaItem(i));
       AudioServiceBackground.androidForceEnableMediaButtons();
       try {
         //await _tts.speak('$i');
-        await _tts.speak('$factor1 por $factor2 es igual a $result');
+        await _tts.speak(playList[i]);
 
         print('Index: $i');
         i++;
         await _sleeper.sleep(Duration(milliseconds: 300));
         //await _sleeper.sleep(Duration(seconds: 1));
+        //Pause
+        await _playPause();
       } catch (e) {
         // Speech was interrupted
       }
@@ -232,7 +249,7 @@ class TextPlayerTask extends BackgroundAudioTask {
       artist: 'Sample Artist');
 
   Future<void> _playPause() async {
-    final session = await AudioSession.instance;
+    //final session = await AudioSession.instance;
     if (_playing) {
       if (Platform.isAndroid) {
         _interrupted = false;
