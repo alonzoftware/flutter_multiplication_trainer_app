@@ -244,20 +244,28 @@ class TextPlayerTask extends BackgroundAudioTask {
         _tts.interrupt();
         _sleeper.interrupt();
       } else {
-        print(AudioServiceBackground.state.position);
-        //_interrupted = false;
-        //print(AudioServiceBackground.state.);
-        if (await session.setActive(true)) {
-          _tts.interrupt();
-          _sleeper.interrupt();
-          await _sleeper.sleep(Duration(milliseconds: 350));
-          await AudioServiceBackground.setState(
-            controls: [MediaControl.play, MediaControl.stop],
-            processingState: AudioProcessingState.ready,
-            playing: false,
-          );
-          _tts.interrupt();
-        }
+        _interrupted = false;
+        await AudioServiceBackground.setState(
+          controls: [MediaControl.play, MediaControl.stop],
+          processingState: AudioProcessingState.ready,
+          playing: false,
+        );
+        _tts.interrupt();
+        _sleeper.interrupt();
+        // print(AudioServiceBackground.state.position);
+        // //_interrupted = false;
+        // //print(AudioServiceBackground.state.);
+        // if (await session.setActive(true)) {
+        //   _tts.interrupt();
+        //   _sleeper.interrupt();
+        //   await _sleeper.sleep(Duration(milliseconds: 350));
+        //   await AudioServiceBackground.setState(
+        //     controls: [MediaControl.play, MediaControl.stop],
+        //     processingState: AudioProcessingState.ready,
+        //     playing: false,
+        //   );
+        //   _tts.interrupt();
+        // }
       }
     } else {
       final session = await AudioSession.instance;
