@@ -69,7 +69,7 @@ class _AudioPageState extends State<AudioPage> {
     int factor1 = 0;
     int factor2 = 0;
     int result = 0;
-    int count = 5;
+    int count = prefs.numOperations;
 
     for (int i = 0; i < count; i++) {
       rnd = new Random();

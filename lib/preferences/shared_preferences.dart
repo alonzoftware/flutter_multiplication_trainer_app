@@ -38,6 +38,12 @@ class _SharedPrefs {
 
   int get maxLimit => _prefs.getInt('maxLimit') ?? 10;
   set maxLimit(int value) => _prefs.setInt('maxLimit', value);
+
+  int get numOperations => _prefs.getInt('numOperations') ?? 25;
+  set numOperations(int value) => _prefs.setInt('numOperations', value);
+
+  int get numRepetitions => _prefs.getInt('numRepetitions') ?? 2;
+  set numRepetitions(int value) => _prefs.setInt('numRepetitions', value);
 }
 
 final sharedPrefsService = new _SharedPrefs();
