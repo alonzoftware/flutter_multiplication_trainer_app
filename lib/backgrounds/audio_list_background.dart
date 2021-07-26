@@ -173,8 +173,12 @@ class TextPlayerTask extends BackgroundAudioTask {
       factor1 = operations[i]['factor1'];
       factor2 = operations[i]['factor2'];
       result = operations[i]['result'];
+      String prefix = "";
+      if (i == operations.length - 1) {
+        prefix = "Ultima ";
+      }
       for (int j = 0; j < repetitions; j++) {
-        playList.add('operación $factor1 por $factor2');
+        playList.add('$prefix operación $factor1 por $factor2');
       }
       playList.add('$factor1 por $factor2 es igual a $result');
     }

@@ -17,15 +17,23 @@ class _SettingsPageState extends State<SettingsPage> {
   TextEditingController textEditingControllerMaxLimit =
       new TextEditingController(text: 0.toString());
 
+  TextEditingController textEditingControllerNumRepetitions =
+      new TextEditingController(text: 0.toString());
+
+  TextEditingController textEditingControllerNumOperations =
+      new TextEditingController(text: 0.toString());
+
   late int _opcionSeleccionada;
 
-  List<int> _bases = [5, 10, 20, 50, 100];
+  List<int> _bases = [5, 10, 20, 50, 100, 200];
 
   @override
   void initState() {
     _opcionSeleccionada = prefs.base;
     textEditingControllerMinLimit.text = prefs.minLimit.toString();
     textEditingControllerMaxLimit.text = prefs.maxLimit.toString();
+    textEditingControllerNumRepetitions.text = prefs.numRepetitions.toString();
+    textEditingControllerNumOperations.text = prefs.numOperations.toString();
     super.initState();
   }
 
@@ -55,6 +63,22 @@ class _SettingsPageState extends State<SettingsPage> {
                   TextFieldLimit(
                     labelText: 'Max. Limit',
                     textEditingController: textEditingControllerMaxLimit,
+                    onChanged: (value) {
+                      //textEditingControllerMaxLimit.text = value;
+                      //FocusScope.of(context).unfocus();
+                    },
+                  ),
+                  TextFieldLimit(
+                    labelText: 'Num. Operations',
+                    textEditingController: textEditingControllerNumOperations,
+                    onChanged: (value) {
+                      //textEditingControllerMaxLimit.text = value;
+                      //FocusScope.of(context).unfocus();
+                    },
+                  ),
+                  TextFieldLimit(
+                    labelText: 'Num. Repetitions',
+                    textEditingController: textEditingControllerNumRepetitions,
                     onChanged: (value) {
                       //textEditingControllerMaxLimit.text = value;
                       //FocusScope.of(context).unfocus();
@@ -97,6 +121,8 @@ class _SettingsPageState extends State<SettingsPage> {
   void save(BuildContext context) {
     prefs.minLimit = int.parse(textEditingControllerMinLimit.text);
     prefs.maxLimit = int.parse(textEditingControllerMaxLimit.text);
+    prefs.numRepetitions = int.parse(textEditingControllerNumRepetitions.text);
+    prefs.numOperations = int.parse(textEditingControllerNumOperations.text);
     prefs.base = _opcionSeleccionada;
     Navigator.pop(context);
   }
@@ -159,6 +185,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   case 100:
                     textEditingControllerMinLimit.text = '90';
                     textEditingControllerMaxLimit.text = '110';
+                    break;
+                  case 200:
+                    textEditingControllerMinLimit.text = '180';
+                    textEditingControllerMaxLimit.text = '120';
                     break;
                   default:
                 }

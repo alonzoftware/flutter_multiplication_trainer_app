@@ -42,7 +42,7 @@ class _SharedPrefs {
   int get numOperations => _prefs.getInt('numOperations') ?? 25;
   set numOperations(int value) => _prefs.setInt('numOperations', value);
 
-  int get numRepetitions => _prefs.getInt('numRepetitions') ?? 2;
+  int get numRepetitions => _prefs.getInt('numRepetitions') ?? 1;
   set numRepetitions(int value) => _prefs.setInt('numRepetitions', value);
 }
 

@@ -149,7 +149,7 @@ class _AudioPageState extends State<AudioPage> {
             : () async {
                 Map<String, dynamic> params = {
                   'Operations': operationsJson,
-                  'Repetitions': 2
+                  'Repetitions': prefs.numRepetitions,
                 };
                 print(params);
                 isPlayingForUI = true;
